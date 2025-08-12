@@ -21,8 +21,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
     diagnosis: user?.profile.diagnosis || 'tea',
     theme: user?.profile.preferences.theme || 'light',
     fontSize: user?.profile.preferences.fontSize || 'medium',
-    reduceMotion: user?.profile.preferences.reduceMotion || false,
-    soundEnabled: user?.profile.preferences.soundEnabled || true
+    reduceMotion: Boolean(user?.profile.preferences.reduceMotion || false),
+    soundEnabled: Boolean(user?.profile.preferences.soundEnabled ?? true)
   });
 
   if (!user) {
@@ -88,8 +88,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
       diagnosis: user.profile.diagnosis || 'tea',
       theme: user.profile.preferences.theme,
       fontSize: user.profile.preferences.fontSize,
-      reduceMotion: user.profile.preferences.reduceMotion,
-      soundEnabled: user.profile.preferences.soundEnabled
+      reduceMotion: Boolean(user.profile.preferences.reduceMotion),
+      soundEnabled: Boolean(user.profile.preferences.soundEnabled)
     });
     setIsEditing(false);
     setError(null);

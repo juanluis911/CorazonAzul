@@ -1,6 +1,6 @@
 // src/config/firebase.ts
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { getAuth, Auth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAnalytics, Analytics } from 'firebase/analytics';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
@@ -70,12 +70,7 @@ try {
   throw error;
 }
 
-// Configuración de Auth
-auth.languageCode = 'es';
-
 // Configurar persistencia de autenticación
-import { setPersistence, browserLocalPersistence } from 'firebase/auth';
-
 setPersistence(auth, browserLocalPersistence)
   .then(() => {
     console.log('✅ Persistencia de autenticación configurada');

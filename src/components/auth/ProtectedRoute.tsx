@@ -1,49 +1,52 @@
 // src/components/auth/ProtectedRoute.tsx
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import LoginForm from './LoginForm';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
+  children?: React.ReactNode;
   fallback?: React.ReactNode;
+  requiredRole?: 'parent' | 'therapist' | 'educator';
 }
 
-/**
- * Componente que protege rutas requiriendo autenticación
- * Muestra el formulario de login si el usuario no está autenticado
- */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireAuth = true,
-  fallback
+  fallback,
+  requiredRole 
 }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   // Mostrar loading mientras se verifica autenticación
   if (loading) {
     return (
-      <div className="auth-loading">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
+      <div className="loading-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
           <p>Verificando autenticación...</p>
         </div>
       </div>
     );
   }
 
-  // Si no requiere auth, mostrar contenido
-  if (!requireAuth) {
-    return <>{children}</>;
+  // Si no está autenticado, redirigir al login
+  if (!isAuthenticated) {
+    return fallback ? <>{fallback}</> : <Navigate to="/login" replace />;
   }
 
-  // Si está autenticado, mostrar contenido protegido
-  if (isAuthenticated) {
-    return <>{children}</>;
+  // Verificar rol requerido si se especifica
+  if (requiredRole && user?.role !== requiredRole) {
+    return (
+      <div className="access-denied">
+        <h2>Acceso Denegado</h2>
+        <p>No tienes permisos para acceder a esta sección.</p>
+        <p>Rol requerido: {requiredRole}</p>
+        <p>Tu rol actual: {user?.role}</p>
+      </div>
+    );
   }
 
-  // Si no está autenticado, mostrar login o fallback
-  return fallback ? <>{fallback}</> : <LoginForm />;
+  // Si está autenticado y tiene los permisos necesarios, mostrar el contenido
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

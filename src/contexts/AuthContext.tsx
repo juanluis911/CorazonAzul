@@ -30,6 +30,7 @@ export interface UserProfile {
     totalTimeSpent: number;
     lastActivity: Date;
     achievements: string[];
+    currentLevel: number;
   };
 }
 
@@ -40,6 +41,11 @@ export interface MenteAzulUser {
   photoURL?: string;
   role: 'parent' | 'therapist' | 'educator';
   profile: UserProfile;
+  subscription: {
+    plan: 'free' | 'premium';
+    status: 'active' | 'inactive' | 'trial';
+    expiresAt?: Date;
+  };
   createdAt: Date;
   lastLoginAt: Date;
 }
@@ -49,6 +55,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
   // Métodos de autenticación
   loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, userData: Partial<MenteAzulUser>) => Promise<void>;
@@ -104,8 +111,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         gamesCompleted: 0,
         totalTimeSpent: 0,
         lastActivity: new Date(),
-        achievements: []
+        achievements: [],
+        currentLevel: 1
       }
+    },
+    subscription: {
+      plan: 'free',
+      status: 'active'
     },
     createdAt: new Date(),
     lastLoginAt: new Date()
@@ -328,6 +340,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     firebaseUser,
     loading,
     error,
+    isAuthenticated: !!user,
     loginWithGoogle,
     register,
     login,

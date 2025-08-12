@@ -1,14 +1,25 @@
 // src/components/Dashboard.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import UserProfile from './common/UserProfile';
-import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Cargando...</h2>
+      </div>
+    );
+  }
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 18) return 'Buenas tardes';
+    return 'Buenas noches';
+  };
 
   const handleLogout = async () => {
     try {
@@ -19,202 +30,248 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="dashboard">
-      {/* Header con información del usuario */}
-      <header className="dashboard-header">
-        <div className="header-container">
-          <div className="logo-section">
-            <h1 className="main-title">
-              <span className="mente">Mente</span>
-              <span className="azul">Azul</span>
-            </h1>
-          </div>
-
-          <div className="user-section">
-            <div className="welcome-message">
-              <h2>
-                ¡Hola, {user.displayName}! 👋
-              </h2>
-              {user.role === 'parent' && user.profile.childName && (
-                <p className="child-info">
-                  Perfil de: <strong>{user.profile.childName}</strong>
-                  {user.profile.childAge && ` (${user.profile.childAge} años)`}
-                </p>
-              )}
-            </div>
-
-            <div className="user-controls">
-              <button
-                onClick={() => setShowProfile(!showProfile)}
-                className="profile-btn"
-                aria-label="Ver perfil de usuario"
-              >
-                {user.photoURL ? (
-                  <img 
-                    src={user.photoURL} 
-                    alt="Avatar" 
-                    className="user-avatar"
-                  />
-                ) : (
-                  <div className="user-avatar-placeholder">
-                    {user.displayName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="user-name">{user.displayName}</span>
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="logout-btn"
-                aria-label="Cerrar sesión"
-              >
-                Salir
-              </button>
-            </div>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Header */}
+      <header style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: '30px',
+        padding: '20px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '8px'
+      }}>
+        <div>
+          <h1 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>
+            {getGreeting()}, {user.displayName}!
+          </h1>
+          <p style={{ margin: 0, color: '#666' }}>
+            {user.role === 'parent' && user.profile.childName
+              ? `Continuemos el aprendizaje de ${user.profile.childName}`
+              : 'Continuemos con el aprendizaje'}
+          </p>
+          <div style={{ marginTop: '10px' }}>
+            <span style={{
+              padding: '4px 12px',
+              backgroundColor: user.subscription.status === 'active' ? '#28a745' : '#ffc107',
+              color: 'white',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}>
+              Plan {user.subscription.plan === 'free' ? 'Gratuito' : 'Premium'}
+            </span>
           </div>
         </div>
-
-        {/* Perfil desplegable */}
-        {showProfile && (
-          <UserProfile 
-            user={user} 
-            onClose={() => setShowProfile(false)} 
-          />
-        )}
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button 
+            onClick={() => setShowProfile(!showProfile)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#2c5aa0',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            {showProfile ? 'Ocultar Perfil' : 'Ver Perfil'}
+          </button>
+          <button 
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cerrar Sesión
+          </button>
+        </div>
       </header>
 
-      {/* Contenido principal */}
-      <main className="dashboard-main">
-        <div className="main-container">
+      {/* Perfil (si está visible) */}
+      {showProfile && (
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6',
+          marginBottom: '20px'
+        }}>
+          <h3 style={{ marginTop: 0, color: '#2c5aa0' }}>Información del Perfil</h3>
           
-          {/* Mensaje de bienvenida personalizado */}
-          <section className="welcome-section">
-            <div className="welcome-card">
-              <h3>
-                🎉 ¡Bienvenido a tu espacio de aprendizaje!
-              </h3>
-              <p>
-                {user.role === 'parent' 
-                  ? `Aquí podrás encontrar juegos y actividades especialmente diseñados para ${user.profile.childName || 'tu hijo/a'}.`
-                  : 'Aquí encontrarás herramientas educativas especializadas para tus estudiantes.'
-                }
-              </p>
-              <div className="subscription-status">
-                <span className={`status-badge ${user.subscription.status}`}>
-                  Plan {user.subscription.plan === 'free' ? 'Gratuito' : 'Premium'}
-                </span>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+            <div>
+              <h4>Información Personal</h4>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>Rol:</strong> {user.role}</p>
+              {user.role === 'parent' && (
+                <>
+                  <p><strong>Nombre del niño/a:</strong> {user.profile.childName || 'No especificado'}</p>
+                  <p><strong>Edad:</strong> {user.profile.childAge || 'No especificada'}</p>
+                  <p><strong>Diagnóstico:</strong> {user.profile.diagnosis || 'No especificado'}</p>
+                </>
+              )}
             </div>
-          </section>
-
-          {/* Navegación principal */}
-          <section className="main-navigation">
-            <h3>¿Qué te gustaría hacer hoy?</h3>
             
-            <div className="nav-grid">
-              <button 
-                className="nav-card primary"
-                onClick={() => console.log('Ir a Juegos')}
-                aria-label="Acceder a los juegos educativos"
-              >
-                <div className="card-icon">🎮</div>
-                <h4>Juegos Educativos</h4>
-                <p>Actividades interactivas para desarrollar habilidades</p>
-                <div className="card-stats">
-                  {user.profile.progress.gamesCompleted} juegos completados
-                </div>
-              </button>
-              
-              <button 
-                className="nav-card secondary"
-                onClick={() => console.log('Ir a Progreso')}
-                aria-label="Ver progreso de aprendizaje"
-              >
-                <div className="card-icon">📊</div>
-                <h4>Mi Progreso</h4>
-                <p>Seguimiento del desarrollo y logros</p>
-                <div className="card-stats">
-                  Nivel {user.profile.progress.currentLevel}
-                </div>
-              </button>
-              
-              <button 
-                className="nav-card tertiary"
-                onClick={() => console.log('Ir a Recursos')}
-                aria-label="Acceder a recursos educativos"
-              >
-                <div className="card-icon">📚</div>
-                <h4>Recursos</h4>
-                <p>Guías y material de apoyo</p>
-                <div className="card-stats">
-                  Para {user.role === 'parent' ? 'padres' : 'educadores'}
-                </div>
-              </button>
-              
-              <button 
-                className="nav-card quaternary"
-                onClick={() => setShowProfile(true)}
-                aria-label="Configurar preferencias"
-              >
-                <div className="card-icon">⚙️</div>
-                <h4>Configuración</h4>
-                <p>Personalizar experiencia y accesibilidad</p>
-                <div className="card-stats">
-                  Tema: {user.profile.preferences.theme}
-                </div>
-              </button>
+            <div>
+              <h4>Preferencias</h4>
+              <p><strong>Tema:</strong> {user.profile.preferences.theme}</p>
+              <p><strong>Tamaño de fuente:</strong> {user.profile.preferences.fontSize}</p>
+              <p><strong>Reducir animaciones:</strong> {user.profile.preferences.reduceMotion ? 'Sí' : 'No'}</p>
+              <p><strong>Sonidos:</strong> {user.profile.preferences.soundEnabled ? 'Habilitados' : 'Deshabilitados'}</p>
             </div>
-          </section>
-
-          {/* Actividad reciente */}
-          <section className="recent-activity">
-            <h3>Actividad Reciente</h3>
-            <div className="activity-card">
-              <div className="activity-content">
-                <p>
-                  🎯 Te registraste en MenteAzul con éxito
-                </p>
-                <p className="activity-time">
-                  {user.createdAt.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
+            
+            <div>
+              <h4>Progreso</h4>
+              <p><strong>Nivel actual:</strong> {user.profile.progress.currentLevel}</p>
+              <p><strong>Juegos completados:</strong> {user.profile.progress.gamesCompleted}</p>
+              <p><strong>Tiempo total:</strong> {Math.round(user.profile.progress.totalTimeSpent / 60)} minutos</p>
+              <p><strong>Logros:</strong> {user.profile.progress.achievements.length}</p>
             </div>
-          </section>
-
-          {/* Información del proyecto */}
-          <section className="project-info">
-            <div className="info-card">
-              <h4>📋 Estado del Proyecto CorazónAzul</h4>
-              <ul className="project-status">
-                <li>✅ Sistema de autenticación implementado</li>
-                <li>✅ Dashboard personalizado</li>
-                <li>✅ Perfiles de usuario especializados</li>
-                <li>⏳ Juegos educativos (próximamente)</li>
-                <li>⏳ Sistema de progreso (próximamente)</li>
-                <li>⏳ Recursos para padres (próximamente)</li>
-              </ul>
-            </div>
-          </section>
+          </div>
         </div>
-      </main>
+      )}
 
-      {/* Footer */}
-      <footer className="dashboard-footer">
-        <div className="footer-container">
-          <p>
-            <strong>MenteAzul</strong> - Proyecto CorazónAzul v0.1.0
-          </p>
-          <p>
-            Desarrollado con ❤️ para la comunidad TEA
-          </p>
+      {/* Estadísticas */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎮</div>
+          <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Juegos Completados</h3>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
+            {user.profile.progress.gamesCompleted}
+          </div>
         </div>
-      </footer>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '32px', marginBottom: '10px' }}>⏰</div>
+          <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Tiempo de Aprendizaje</h3>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#17a2b8' }}>
+            {Math.round(user.profile.progress.totalTimeSpent / 60)} min
+          </div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '32px', marginBottom: '10px' }}>🏆</div>
+          <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Logros</h3>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107' }}>
+            {user.profile.progress.achievements.length}
+          </div>
+        </div>
+
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '32px', marginBottom: '10px' }}>📈</div>
+          <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Nivel Actual</h3>
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#6f42c1' }}>
+            {user.profile.progress.currentLevel}
+          </div>
+        </div>
+      </div>
+
+      {/* Acciones Rápidas */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        border: '1px solid #dee2e6'
+      }}>
+        <h3 style={{ marginTop: 0, color: '#2c5aa0' }}>Acciones Rápidas</h3>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '15px' 
+        }}>
+          <button style={{
+            padding: '20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>🎯</div>
+            <div style={{ fontWeight: 'bold' }}>Continuar Aprendizaje</div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>Retoma donde lo dejaste</div>
+          </button>
+
+          <button style={{
+            padding: '20px',
+            backgroundColor: '#17a2b8',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+            <div style={{ fontWeight: 'bold' }}>Ver Progreso Detallado</div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>Seguimiento completo</div>
+          </button>
+
+          <button style={{
+            padding: '20px',
+            backgroundColor: '#6f42c1',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>🎮</div>
+            <div style={{ fontWeight: 'bold' }}>Explorar Juegos</div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>Nuevas actividades</div>
+          </button>
+
+          <button style={{
+            padding: '20px',
+            backgroundColor: '#ffc107',
+            color: 'black',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚙️</div>
+            <div style={{ fontWeight: 'bold' }}>Configuración</div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>Personalizar experiencia</div>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

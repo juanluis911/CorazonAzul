@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { UserProfile } from '../../contexts/AuthContext';
-import './LoginForm.css';
 
 interface LoginFormData {
   email: string;
@@ -39,7 +38,6 @@ const LoginForm: React.FC = () => {
     
     try {
       if (isRegister) {
-        // Crear perfil con tipos seguros
         const profile: UserProfile = {
           preferences: {
             theme: 'light',
@@ -51,11 +49,11 @@ const LoginForm: React.FC = () => {
             gamesCompleted: 0,
             totalTimeSpent: 0,
             lastActivity: new Date(),
-            achievements: []
+            achievements: [],
+            currentLevel: 1
           }
         };
 
-        // Solo agregar datos del niño si el rol es 'parent' y los campos están llenos
         if (formData.role === 'parent') {
           if (formData.childName.trim()) {
             profile.childName = formData.childName.trim();
@@ -105,37 +103,206 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    },
+    card: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(10px)',
+      borderRadius: '20px',
+      padding: '40px',
+      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
+      width: '100%',
+      maxWidth: '450px',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    },
+    header: {
+      textAlign: 'center' as const,
+      marginBottom: '30px'
+    },
+    logo: {
+      fontSize: '48px',
+      marginBottom: '10px'
+    },
+    title: {
+      fontSize: '28px',
+      fontWeight: '700',
+      color: '#2c3e50',
+      margin: '0 0 8px 0'
+    },
+    subtitle: {
+      color: '#7f8c8d',
+      fontSize: '16px',
+      margin: 0
+    },
+    form: {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '20px'
+    },
+    formGroup: {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '6px'
+    },
+    label: {
+      color: '#2c3e50',
+      fontSize: '14px',
+      fontWeight: '600'
+    },
+    input: {
+      padding: '12px 16px',
+      border: '2px solid #e1e8ed',
+      borderRadius: '12px',
+      fontSize: '16px',
+      transition: 'all 0.3s ease',
+      backgroundColor: 'white',
+      outline: 'none'
+    },
+    inputFocus: {
+      borderColor: '#667eea',
+      boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)'
+    },
+    select: {
+      padding: '12px 16px',
+      border: '2px solid #e1e8ed',
+      borderRadius: '12px',
+      fontSize: '16px',
+      backgroundColor: 'white',
+      cursor: 'pointer',
+      outline: 'none'
+    },
+    submitBtn: {
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white',
+      border: 'none',
+      padding: '14px 24px',
+      borderRadius: '12px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      marginTop: '10px'
+    },
+    googleBtn: {
+      background: 'white',
+      color: '#2c3e50',
+      border: '2px solid #e1e8ed',
+      padding: '12px 24px',
+      borderRadius: '12px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '10px',
+      transition: 'all 0.3s ease'
+    },
+    divider: {
+      display: 'flex',
+      alignItems: 'center',
+      margin: '20px 0',
+      color: '#7f8c8d'
+    },
+    dividerLine: {
+      flex: 1,
+      height: '1px',
+      background: '#e1e8ed'
+    },
+    dividerText: {
+      padding: '0 15px',
+      fontSize: '14px'
+    },
+    linkBtn: {
+      background: 'none',
+      border: 'none',
+      color: '#667eea',
+      fontSize: '14px',
+      cursor: 'pointer',
+      textDecoration: 'underline',
+      padding: '5px 0'
+    },
+    footer: {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '10px',
+      alignItems: 'center',
+      marginTop: '20px'
+    },
+    errorMessage: {
+      background: '#ffe6e6',
+      color: '#c0392b',
+      padding: '12px 16px',
+      borderRadius: '8px',
+      fontSize: '14px',
+      border: '1px solid #ffcccb'
+    },
+    roleSection: {
+      background: '#f8f9fa',
+      padding: '20px',
+      borderRadius: '12px',
+      border: '1px solid #e9ecef'
+    },
+    roleSectionTitle: {
+      color: '#495057',
+      fontSize: '16px',
+      fontWeight: '600',
+      marginBottom: '15px',
+      textAlign: 'center' as const
+    }
+  };
+
   if (showForgotPassword) {
     return (
-      <div className="login-form">
-        <div className="form-container">
-          <h2>Recuperar Contraseña</h2>
-          <form onSubmit={handleForgotPassword}>
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <div style={styles.logo}>🧠💙</div>
+            <h2 style={styles.title}>Recuperar Contraseña</h2>
+            <p style={styles.subtitle}>Te enviaremos un enlace de recuperación</p>
+          </div>
+          
+          <form onSubmit={handleForgotPassword} style={styles.form}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Email:</label>
               <input
-                id="email"
-                name="email"
                 type="email"
+                name="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
                 placeholder="tu@email.com"
+                style={styles.input}
               />
             </div>
             
-            {error && <div className="error-message">{error}</div>}
+            {error && <div style={styles.errorMessage}>{error}</div>}
             
-            <button type="submit" disabled={loading} className="submit-btn">
+            <button 
+              type="submit" 
+              disabled={loading} 
+              style={{
+                ...styles.submitBtn,
+                opacity: loading ? 0.7 : 1
+              }}
+            >
               {loading ? 'Enviando...' : 'Enviar Email de Recuperación'}
             </button>
             
             <button 
               type="button" 
               onClick={() => setShowForgotPassword(false)}
-              className="link-btn"
+              style={styles.linkBtn}
             >
-              Volver al login
+              ← Volver al login
             </button>
           </form>
         </div>
@@ -144,149 +311,180 @@ const LoginForm: React.FC = () => {
   }
 
   return (
-    <div className="login-form">
-      <div className="form-container">
-        <h2>{isRegister ? 'Crear Cuenta' : 'Iniciar Sesión'}</h2>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.header}>
+          <div style={styles.logo}>🧠💙</div>
+          <h2 style={styles.title}>MenteAzul</h2>
+          <p style={styles.subtitle}>
+            {isRegister ? 'Crea tu cuenta para comenzar' : 'Bienvenido de vuelta'}
+          </p>
+        </div>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={styles.form}>
           {isRegister && (
             <>
-              <div className="form-group">
-                <label htmlFor="displayName">Nombre completo:</label>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Nombre completo *</label>
                 <input
-                  id="displayName"
-                  name="displayName"
                   type="text"
+                  name="displayName"
                   value={formData.displayName}
                   onChange={handleInputChange}
                   required
                   placeholder="Tu nombre completo"
+                  style={styles.input}
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="role">Rol:</label>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>¿Cuál es tu rol? *</label>
                 <select
-                  id="role"
                   name="role"
                   value={formData.role}
                   onChange={handleInputChange}
                   required
+                  style={styles.select}
                 >
-                  <option value="parent">Padre/Madre</option>
-                  <option value="therapist">Terapeuta</option>
-                  <option value="educator">Educador</option>
+                  <option value="parent">👨‍👩‍👧‍👦 Padre/Madre</option>
+                  <option value="therapist">🩺 Terapeuta</option>
+                  <option value="educator">👩‍🏫 Educador</option>
                 </select>
               </div>
 
               {formData.role === 'parent' && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="childName">Nombre del niño/a (opcional):</label>
+                <div style={styles.roleSection}>
+                  <h4 style={styles.roleSectionTitle}>Información del niño/a (opcional)</h4>
+                  
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre del niño/a</label>
                     <input
-                      id="childName"
-                      name="childName"
                       type="text"
+                      name="childName"
                       value={formData.childName}
                       onChange={handleInputChange}
                       placeholder="Nombre del niño/a"
+                      style={styles.input}
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label htmlFor="childAge">Edad del niño/a (opcional):</label>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Edad</label>
                     <input
-                      id="childAge"
-                      name="childAge"
                       type="number"
+                      name="childAge"
                       min="2"
                       max="18"
                       value={formData.childAge}
                       onChange={handleInputChange}
-                      placeholder="Edad"
+                      placeholder="Edad en años"
+                      style={styles.input}
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label htmlFor="diagnosis">Diagnóstico (opcional):</label>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Diagnóstico</label>
                     <select
-                      id="diagnosis"
                       name="diagnosis"
                       value={formData.diagnosis}
                       onChange={handleInputChange}
+                      style={styles.select}
                     >
-                      <option value="tea">TEA (Trastorno del Espectro Autista)</option>
-                      <option value="asperger">Síndrome de Asperger</option>
-                      <option value="autismo">Autismo Clásico</option>
-                      <option value="otro">Otro</option>
+                      <option value="tea">🧩 TEA (Trastorno del Espectro Autista)</option>
+                      <option value="asperger">🎯 Síndrome de Asperger</option>
+                      <option value="autismo">🌟 Autismo Clásico</option>
+                      <option value="otro">📋 Otro</option>
                     </select>
                   </div>
-                </>
+                </div>
               )}
             </>
           )}
 
-          <div className="form-group">
-            <label htmlFor="email">Email:</label>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Email *</label>
             <input
-              id="email"
-              name="email"
               type="email"
+              name="email"
               value={formData.email}
               onChange={handleInputChange}
               required
               placeholder="tu@email.com"
+              style={styles.input}
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Contraseña:</label>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Contraseña *</label>
             <input
-              id="password"
-              name="password"
               type="password"
+              name="password"
               value={formData.password}
               onChange={handleInputChange}
               required
-              placeholder="Tu contraseña"
+              placeholder="Mínimo 6 caracteres"
               minLength={6}
+              style={styles.input}
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && <div style={styles.errorMessage}>{error}</div>}
 
-          <button type="submit" disabled={loading} className="submit-btn">
-            {loading ? 'Procesando...' : (isRegister ? 'Crear Cuenta' : 'Iniciar Sesión')}
+          <button 
+            type="submit" 
+            disabled={loading} 
+            style={{
+              ...styles.submitBtn,
+              opacity: loading ? 0.7 : 1,
+              transform: loading ? 'scale(0.98)' : 'scale(1)'
+            }}
+          >
+            {loading ? (
+              <span>⏳ Procesando...</span>
+            ) : (
+              isRegister ? '🚀 Crear Cuenta' : '🔓 Iniciar Sesión'
+            )}
           </button>
         </form>
 
-        <div className="divider">
-          <span>o</span>
+        <div style={styles.divider}>
+          <div style={styles.dividerLine}></div>
+          <span style={styles.dividerText}>o</span>
+          <div style={styles.dividerLine}></div>
         </div>
 
         <button 
           onClick={handleGoogleLogin} 
           disabled={loading}
-          className="google-btn"
+          style={{
+            ...styles.googleBtn,
+            opacity: loading ? 0.7 : 1
+          }}
         >
-          <span>🔑</span>
+          <span style={{ fontSize: '20px' }}>🔑</span>
           Continuar con Google
         </button>
 
-        <div className="form-footer">
+        <div style={styles.footer}>
           <button 
             type="button"
-            onClick={() => setIsRegister(!isRegister)}
-            className="link-btn"
+            onClick={() => {
+              setIsRegister(!isRegister);
+              clearError();
+            }}
+            style={styles.linkBtn}
           >
-            {isRegister ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+            {isRegister 
+              ? '¿Ya tienes cuenta? Inicia sesión aquí' 
+              : '¿No tienes cuenta? Regístrate gratis'
+            }
           </button>
           
           {!isRegister && (
             <button 
               type="button"
               onClick={() => setShowForgotPassword(true)}
-              className="link-btn"
+              style={styles.linkBtn}
             >
               ¿Olvidaste tu contraseña?
             </button>
