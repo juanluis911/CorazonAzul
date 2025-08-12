@@ -1,4 +1,4 @@
-// src/components/Dashboard.tsx
+// src/components/Dashboard.tsx - SIN Sidebar duplicada
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -21,25 +21,48 @@ const Dashboard: React.FC = () => {
     return 'Buenas noches';
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+  // Funciones de eventos de mouse tipadas correctamente
+  const handleButtonMouseOver = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'translateY(-2px)';
+  };
+
+  const handleButtonMouseOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'translateY(0)';
+  };
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: 'white',
+    padding: '25px',
+    borderRadius: '12px',
+    border: '1px solid #dee2e6',
+    textAlign: 'center',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+  };
+
+  const buttonBaseStyle: React.CSSProperties = {
+    padding: '20px',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    transition: 'transform 0.2s ease',
+    fontSize: '16px',
+    color: 'white'
   };
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Header */}
+      
+      {/* Header del contenido principal */}
       <header style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
         marginBottom: '30px',
         padding: '20px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '8px'
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
       }}>
         <div>
           <h1 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>
@@ -72,24 +95,12 @@ const Dashboard: React.FC = () => {
               backgroundColor: '#2c5aa0',
               color: 'white',
               border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px'
             }}
           >
             {showProfile ? 'Ocultar Perfil' : 'Ver Perfil'}
-          </button>
-          <button 
-            onClick={handleLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Cerrar Sesión
           </button>
         </div>
       </header>
@@ -99,9 +110,10 @@ const Dashboard: React.FC = () => {
         <div style={{
           backgroundColor: 'white',
           padding: '20px',
-          borderRadius: '8px',
+          borderRadius: '12px',
           border: '1px solid #dee2e6',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
         }}>
           <h3 style={{ marginTop: 0, color: '#2c5aa0' }}>Información del Perfil</h3>
           
@@ -145,58 +157,34 @@ const Dashboard: React.FC = () => {
         gap: '20px',
         marginBottom: '30px'
       }}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎮</div>
+        <div style={cardStyle}>
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}>🎮</div>
           <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Juegos Completados</h3>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#28a745' }}>
             {user.profile.progress.gamesCompleted}
           </div>
         </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '32px', marginBottom: '10px' }}>⏰</div>
+        <div style={cardStyle}>
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}>⏰</div>
           <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Tiempo de Aprendizaje</h3>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#17a2b8' }}>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#17a2b8' }}>
             {Math.round(user.profile.progress.totalTimeSpent / 60)} min
           </div>
         </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '32px', marginBottom: '10px' }}>🏆</div>
+        <div style={cardStyle}>
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}>🏆</div>
           <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Logros</h3>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107' }}>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#ffc107' }}>
             {user.profile.progress.achievements.length}
           </div>
         </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '32px', marginBottom: '10px' }}>📈</div>
+        <div style={cardStyle}>
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}>📈</div>
           <h3 style={{ margin: '0 0 10px 0', color: '#2c5aa0' }}>Nivel Actual</h3>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#6f42c1' }}>
+          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#6f42c1' }}>
             {user.profile.progress.currentLevel}
           </div>
         </div>
@@ -205,71 +193,126 @@ const Dashboard: React.FC = () => {
       {/* Acciones Rápidas */}
       <div style={{
         backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        padding: '25px',
+        borderRadius: '12px',
+        border: '1px solid #dee2e6',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
       }}>
-        <h3 style={{ marginTop: 0, color: '#2c5aa0' }}>Acciones Rápidas</h3>
+        <h3 style={{ marginTop: 0, color: '#2c5aa0', marginBottom: '20px' }}>Acciones Rápidas</h3>
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
           gap: '15px' 
         }}>
-          <button style={{
-            padding: '20px',
-            backgroundColor: '#28a745',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>🎯</div>
+          <button 
+            style={{
+              ...buttonBaseStyle,
+              backgroundColor: '#28a745'
+            }}
+            onMouseOver={handleButtonMouseOver}
+            onMouseOut={handleButtonMouseOut}
+            onClick={() => console.log('Continuar aprendizaje')}
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎯</div>
             <div style={{ fontWeight: 'bold' }}>Continuar Aprendizaje</div>
             <div style={{ fontSize: '12px', marginTop: '4px' }}>Retoma donde lo dejaste</div>
           </button>
 
-          <button style={{
-            padding: '20px',
-            backgroundColor: '#17a2b8',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+          <button 
+            style={{
+              ...buttonBaseStyle,
+              backgroundColor: '#17a2b8'
+            }}
+            onMouseOver={handleButtonMouseOver}
+            onMouseOut={handleButtonMouseOut}
+            onClick={() => console.log('Ver progreso')}
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>📊</div>
             <div style={{ fontWeight: 'bold' }}>Ver Progreso Detallado</div>
             <div style={{ fontSize: '12px', marginTop: '4px' }}>Seguimiento completo</div>
           </button>
 
-          <button style={{
-            padding: '20px',
-            backgroundColor: '#6f42c1',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>🎮</div>
+          <button 
+            style={{
+              ...buttonBaseStyle,
+              backgroundColor: '#6f42c1'
+            }}
+            onMouseOver={handleButtonMouseOver}
+            onMouseOut={handleButtonMouseOut}
+            onClick={() => console.log('Explorar juegos')}
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎮</div>
             <div style={{ fontWeight: 'bold' }}>Explorar Juegos</div>
             <div style={{ fontSize: '12px', marginTop: '4px' }}>Nuevas actividades</div>
           </button>
 
-          <button style={{
-            padding: '20px',
-            backgroundColor: '#ffc107',
-            color: 'black',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚙️</div>
+          <button 
+            style={{
+              ...buttonBaseStyle,
+              backgroundColor: '#ffc107',
+              color: 'black'
+            }}
+            onMouseOver={handleButtonMouseOver}
+            onMouseOut={handleButtonMouseOut}
+            onClick={() => console.log('Configuración')}
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>⚙️</div>
             <div style={{ fontWeight: 'bold' }}>Configuración</div>
             <div style={{ fontSize: '12px', marginTop: '4px' }}>Personalizar experiencia</div>
           </button>
+        </div>
+      </div>
+
+      {/* Actividad Reciente */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '25px',
+        borderRadius: '12px',
+        border: '1px solid #dee2e6',
+        marginTop: '20px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
+      }}>
+        <h3 style={{ marginTop: 0, color: '#2c5aa0', marginBottom: '20px' }}>Actividad Reciente</h3>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: '15px' 
+        }}>
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            borderLeft: '4px solid #28a745'
+          }}>
+            <div style={{ fontWeight: 'bold', color: '#2c5aa0' }}>Juego de Colores completado</div>
+            <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
+              Hace 2 horas • Puntuación: 85/100
+            </div>
+          </div>
+          
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            borderLeft: '4px solid #17a2b8'
+          }}>
+            <div style={{ fontWeight: 'bold', color: '#2c5aa0' }}>Nuevo logro desbloqueado</div>
+            <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
+              Hace 1 día • "Primer paso en comunicación"
+            </div>
+          </div>
+          
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            borderLeft: '4px solid #6f42c1'
+          }}>
+            <div style={{ fontWeight: 'bold', color: '#2c5aa0' }}>Sesión de 30 minutos completada</div>
+            <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
+              Hace 3 días • Habilidades sociales
+            </div>
+          </div>
         </div>
       </div>
     </div>
