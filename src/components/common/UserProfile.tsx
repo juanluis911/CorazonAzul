@@ -1,431 +1,308 @@
 // src/components/common/UserProfile.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import type { MenteAzulUser } from '../../contexts/AuthContext';
+import type { UserProfile as UserProfileType } from '../../contexts/AuthContext';
 import './UserProfile.css';
 
 interface UserProfileProps {
-  user: MenteAzulUser;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
-  const { updateUserProfile, logout } = useAuth();
+const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
+  const { user, updateUserProfile, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState({
-    childName: user.profile.childName || '',
-    childAge: user.profile.childAge || '',
-    diagnosis: user.profile.diagnosis || 'tea',
-    preferences: {
-      theme: user.profile.preferences.theme,
-      fontSize: user.profile.preferences.fontSize,
-      reduceMotion: user.profile.preferences.reduceMotion,
-      soundEnabled: user.profile.preferences.soundEnabled
-    }
+  const [editData, setEditData] = useState({
+    childName: user?.profile.childName || '',
+    childAge: user?.profile.childAge?.toString() || '',
+    diagnosis: user?.profile.diagnosis || 'tea',
+    theme: user?.profile.preferences.theme || 'light',
+    fontSize: user?.profile.preferences.fontSize || 'medium',
+    reduceMotion: user?.profile.preferences.reduceMotion || false,
+    soundEnabled: user?.profile.preferences.soundEnabled || true
   });
 
-  // Manejar cambios en el formulario
+  if (!user) {
+    return <div>No hay usuario autenticado</div>;
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    if (name.startsWith('preferences.')) {
-      const prefKey = name.split('.')[1] as keyof typeof formData.preferences;
-      setFormData(prev => ({
-        ...prev,
-        preferences: {
-          ...prev.preferences,
-          [prefKey]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-        }
-      }));
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setEditData(prev => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+      setEditData(prev => ({ ...prev, [name]: value }));
     }
-    
-    setError('');
-    setSuccess('');
   };
 
-  // Guardar cambios
   const handleSave = async () => {
     try {
       setLoading(true);
-      setError('');
-      
-      const updates = {
-        childName: user.role === 'parent' ? formData.childName : undefined,
-        childAge: user.role === 'parent' && formData.childAge ? parseInt(formData.childAge.toString()) : undefined,
-        diagnosis: user.role === 'parent' ? formData.diagnosis as 'tea' | 'asperger' | 'autismo' | 'otro' : undefined,
-        preferences: formData.preferences
+      setError(null);
+      setSuccess(null);
+
+      // Crear el objeto de actualización con tipos seguros
+      const updates: Partial<UserProfileType> = {
+        preferences: {
+          theme: editData.theme as 'light' | 'dark' | 'high-contrast',
+          fontSize: editData.fontSize as 'small' | 'medium' | 'large',
+          reduceMotion: editData.reduceMotion,
+          soundEnabled: editData.soundEnabled
+        }
       };
+
+      // Solo agregar campos opcionales si tienen valor válido
+      if (editData.childName.trim()) {
+        updates.childName = editData.childName.trim();
+      }
+      
+      if (editData.childAge && !isNaN(parseInt(editData.childAge))) {
+        updates.childAge = parseInt(editData.childAge);
+      }
+      
+      if (editData.diagnosis) {
+        updates.diagnosis = editData.diagnosis as 'tea' | 'asperger' | 'autismo' | 'otro';
+      }
 
       await updateUserProfile(updates);
       setSuccess('Perfil actualizado correctamente');
       setIsEditing(false);
       
-      // Auto-cerrar mensaje de éxito
-      setTimeout(() => setSuccess(''), 3000);
-      
-    } catch (error: any) {
-      setError(error.message || 'Error al actualizar el perfil');
+    } catch (error) {
+      console.error('Error actualizando perfil:', error);
+      setError('Error al actualizar el perfil');
     } finally {
       setLoading(false);
     }
   };
 
-  // Cancelar edición
   const handleCancel = () => {
-    setFormData({
+    setEditData({
       childName: user.profile.childName || '',
-      childAge: user.profile.childAge || '',
+      childAge: user.profile.childAge?.toString() || '',
       diagnosis: user.profile.diagnosis || 'tea',
-      preferences: user.profile.preferences
+      theme: user.profile.preferences.theme,
+      fontSize: user.profile.preferences.fontSize,
+      reduceMotion: user.profile.preferences.reduceMotion,
+      soundEnabled: user.profile.preferences.soundEnabled
     });
     setIsEditing(false);
-    setError('');
-    setSuccess('');
+    setError(null);
+    setSuccess(null);
   };
 
-  // Cerrar sesión
   const handleLogout = async () => {
     try {
       await logout();
-      onClose();
+      if (onClose) onClose();
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error('Error en logout:', error);
+      setError('Error al cerrar sesión');
     }
   };
 
   return (
-    <div className="user-profile-overlay" onClick={onClose}>
-      <div className="user-profile-modal" onClick={(e) => e.stopPropagation()}>
-        
-        {/* Header del perfil */}
-        <div className="profile-header">
-          <div className="profile-avatar-section">
-            {user.photoURL ? (
-              <img 
-                src={user.photoURL} 
-                alt="Avatar del usuario" 
-                className="profile-avatar"
-              />
-            ) : (
-              <div className="profile-avatar-placeholder">
-                {user.displayName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="profile-basic-info">
-              <h2>{user.displayName}</h2>
-              <p className="profile-email">{user.email}</p>
-              <span className={`role-badge ${user.role}`}>
-                {user.role === 'parent' ? 'Padre/Madre' : 'Educador'}
-              </span>
-            </div>
+    <div className="user-profile">
+      <div className="profile-header">
+        <div className="user-info">
+          {user.photoURL && (
+            <img 
+              src={user.photoURL} 
+              alt="Foto de perfil" 
+              className="profile-photo"
+            />
+          )}
+          <div>
+            <h3>{user.displayName}</h3>
+            <p className="user-email">{user.email}</p>
+            <span className="user-role">{user.role}</span>
           </div>
-          
-          <button 
-            className="close-btn"
-            onClick={onClose}
-            aria-label="Cerrar perfil"
-          >
+        </div>
+        
+        {onClose && (
+          <button onClick={onClose} className="close-btn" aria-label="Cerrar perfil">
             ✕
           </button>
-        </div>
-
-        {/* Mensajes de estado */}
-        {error && (
-          <div className="message error" role="alert">
-            {error}
-          </div>
         )}
-        
-        {success && (
-          <div className="message success" role="alert">
-            {success}
-          </div>
-        )}
+      </div>
 
-        {/* Contenido del perfil */}
-        <div className="profile-content">
-          
-          {/* Información de la cuenta */}
-          <section className="profile-section">
-            <h3>Información de la Cuenta</h3>
-            <div className="info-grid">
-              <div className="info-item">
-                <label>Fecha de registro:</label>
-                <span>
-                  {user.createdAt.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
-              </div>
-              <div className="info-item">
-                <label>Último acceso:</label>
-                <span>
-                  {user.lastLoginAt.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </span>
-              </div>
-              <div className="info-item">
-                <label>Plan de suscripción:</label>
-                <span className={`subscription-badge ${user.subscription.plan}`}>
-                  {user.subscription.plan === 'free' ? 'Gratuito' : 'Premium'}
-                </span>
-              </div>
-            </div>
-          </section>
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
 
-          {/* Información del niño (solo para padres) */}
-          {user.role === 'parent' && (
-            <section className="profile-section">
-              <div className="section-header">
-                <h3>Información del Niño/a</h3>
-                {!isEditing && (
-                  <button 
-                    className="edit-btn"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Editar
-                  </button>
-                )}
-              </div>
-              
-              {isEditing ? (
-                <div className="edit-form">
-                  <div className="form-group">
-                    <label htmlFor="childName">Nombre del niño/a:</label>
-                    <input
-                      type="text"
-                      id="childName"
-                      name="childName"
-                      value={formData.childName}
-                      onChange={handleInputChange}
-                      placeholder="Nombre del niño/a"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="childAge">Edad:</label>
-                    <input
-                      type="number"
-                      id="childAge"
-                      name="childAge"
-                      value={formData.childAge}
-                      onChange={handleInputChange}
-                      min="2"
-                      max="18"
-                      placeholder="Edad"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="diagnosis">Diagnóstico:</label>
-                    <select
-                      id="diagnosis"
-                      name="diagnosis"
-                      value={formData.diagnosis}
-                      onChange={handleInputChange}
-                    >
-                      <option value="tea">Trastorno del Espectro Autista (TEA)</option>
-                      <option value="asperger">Síndrome de Asperger</option>
-                      <option value="autismo">Autismo</option>
-                      <option value="otro">Otro</option>
-                    </select>
-                  </div>
-                </div>
-              ) : (
-                <div className="info-display">
-                  <div className="info-item">
-                    <label>Nombre:</label>
-                    <span>{user.profile.childName || 'No especificado'}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>Edad:</label>
-                    <span>{user.profile.childAge ? `${user.profile.childAge} años` : 'No especificada'}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>Diagnóstico:</label>
-                    <span>
-                      {user.profile.diagnosis === 'tea' && 'Trastorno del Espectro Autista (TEA)'}
-                      {user.profile.diagnosis === 'asperger' && 'Síndrome de Asperger'}
-                      {user.profile.diagnosis === 'autismo' && 'Autismo'}
-                      {user.profile.diagnosis === 'otro' && 'Otro'}
-                      {!user.profile.diagnosis && 'No especificado'}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </section>
-          )}
-
-          {/* Preferencias de accesibilidad */}
-          <section className="profile-section">
-            <div className="section-header">
-              <h3>Preferencias de Accesibilidad</h3>
-              {!isEditing && (
-                <button 
-                  className="edit-btn"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Editar
-                </button>
-              )}
-            </div>
+      <div className="profile-content">
+        {isEditing ? (
+          <div className="edit-form">
+            <h4>Editar Perfil</h4>
             
-            {isEditing ? (
-              <div className="edit-form">
+            {user.role === 'parent' && (
+              <>
                 <div className="form-group">
-                  <label htmlFor="theme">Tema visual:</label>
+                  <label htmlFor="childName">Nombre del niño/a:</label>
+                  <input
+                    id="childName"
+                    name="childName"
+                    type="text"
+                    value={editData.childName}
+                    onChange={handleInputChange}
+                    placeholder="Nombre del niño/a"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="childAge">Edad:</label>
+                  <input
+                    id="childAge"
+                    name="childAge"
+                    type="number"
+                    min="2"
+                    max="18"
+                    value={editData.childAge}
+                    onChange={handleInputChange}
+                    placeholder="Edad"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="diagnosis">Diagnóstico:</label>
                   <select
-                    id="theme"
-                    name="preferences.theme"
-                    value={formData.preferences.theme}
+                    id="diagnosis"
+                    name="diagnosis"
+                    value={editData.diagnosis}
                     onChange={handleInputChange}
                   >
-                    <option value="light">Claro</option>
-                    <option value="dark">Oscuro</option>
-                    <option value="high-contrast">Alto contraste</option>
+                    <option value="tea">TEA</option>
+                    <option value="asperger">Asperger</option>
+                    <option value="autismo">Autismo Clásico</option>
+                    <option value="otro">Otro</option>
                   </select>
                 </div>
-                
-                <div className="form-group">
-                  <label htmlFor="fontSize">Tamaño de texto:</label>
-                  <select
-                    id="fontSize"
-                    name="preferences.fontSize"
-                    value={formData.preferences.fontSize}
-                    onChange={handleInputChange}
-                  >
-                    <option value="small">Pequeño</option>
-                    <option value="medium">Mediano</option>
-                    <option value="large">Grande</option>
-                  </select>
-                </div>
-                
-                <div className="form-group checkbox-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="preferences.reduceMotion"
-                      checked={formData.preferences.reduceMotion}
-                      onChange={handleInputChange}
-                    />
-                    Reducir animaciones
-                  </label>
-                </div>
-                
-                <div className="form-group checkbox-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="preferences.soundEnabled"
-                      checked={formData.preferences.soundEnabled}
-                      onChange={handleInputChange}
-                    />
-                    Habilitar sonidos
-                  </label>
-                </div>
-              </div>
-            ) : (
-              <div className="preferences-display">
-                <div className="preference-item">
-                  <span className="preference-label">Tema:</span>
-                  <span className="preference-value">
-                    {user.profile.preferences.theme === 'light' && 'Claro'}
-                    {user.profile.preferences.theme === 'dark' && 'Oscuro'}
-                    {user.profile.preferences.theme === 'high-contrast' && 'Alto contraste'}
-                  </span>
-                </div>
-                <div className="preference-item">
-                  <span className="preference-label">Tamaño de texto:</span>
-                  <span className="preference-value">
-                    {user.profile.preferences.fontSize === 'small' && 'Pequeño'}
-                    {user.profile.preferences.fontSize === 'medium' && 'Mediano'}
-                    {user.profile.preferences.fontSize === 'large' && 'Grande'}
-                  </span>
-                </div>
-                <div className="preference-item">
-                  <span className="preference-label">Animaciones:</span>
-                  <span className="preference-value">
-                    {user.profile.preferences.reduceMotion ? 'Reducidas' : 'Normales'}
-                  </span>
-                </div>
-                <div className="preference-item">
-                  <span className="preference-label">Sonidos:</span>
-                  <span className="preference-value">
-                    {user.profile.preferences.soundEnabled ? 'Habilitados' : 'Deshabilitados'}
-                  </span>
-                </div>
-              </div>
+              </>
             )}
-          </section>
 
-          {/* Progreso del usuario */}
-          <section className="profile-section">
-            <h3>Progreso de Aprendizaje</h3>
-            <div className="progress-stats">
-              <div className="stat-item">
-                <div className="stat-value">{user.profile.progress.gamesCompleted}</div>
-                <div className="stat-label">Juegos Completados</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-value">{user.profile.progress.currentLevel}</div>
-                <div className="stat-label">Nivel Actual</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-value">
-                  {Math.floor(user.profile.progress.totalPlayTime / 60)}min
-                </div>
-                <div className="stat-label">Tiempo Total</div>
-              </div>
+            <h5>Preferencias</h5>
+            
+            <div className="form-group">
+              <label htmlFor="theme">Tema:</label>
+              <select
+                id="theme"
+                name="theme"
+                value={editData.theme}
+                onChange={handleInputChange}
+              >
+                <option value="light">Claro</option>
+                <option value="dark">Oscuro</option>
+                <option value="high-contrast">Alto Contraste</option>
+              </select>
             </div>
-          </section>
-        </div>
 
-        {/* Footer del perfil */}
-        <div className="profile-footer">
-          {isEditing ? (
-            <div className="edit-actions">
+            <div className="form-group">
+              <label htmlFor="fontSize">Tamaño de fuente:</label>
+              <select
+                id="fontSize"
+                name="fontSize"
+                value={editData.fontSize}
+                onChange={handleInputChange}
+              >
+                <option value="small">Pequeño</option>
+                <option value="medium">Mediano</option>
+                <option value="large">Grande</option>
+              </select>
+            </div>
+
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="reduceMotion"
+                  checked={editData.reduceMotion}
+                  onChange={handleInputChange}
+                />
+                Reducir animaciones
+              </label>
+            </div>
+
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="soundEnabled"
+                  checked={editData.soundEnabled}
+                  onChange={handleInputChange}
+                />
+                Habilitar sonidos
+              </label>
+            </div>
+
+            <div className="form-actions">
               <button 
-                className="save-btn"
-                onClick={handleSave}
+                onClick={handleSave} 
                 disabled={loading}
+                className="save-btn"
               >
                 {loading ? 'Guardando...' : 'Guardar'}
               </button>
+              
               <button 
-                className="cancel-btn"
                 onClick={handleCancel}
                 disabled={loading}
+                className="cancel-btn"
               >
                 Cancelar
               </button>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div className="profile-info">
+            <h4>Información del Perfil</h4>
+            
+            {user.role === 'parent' && (
+              <div className="child-info">
+                <h5>Información del niño/a</h5>
+                <p><strong>Nombre:</strong> {user.profile.childName || 'No especificado'}</p>
+                <p><strong>Edad:</strong> {user.profile.childAge || 'No especificada'}</p>
+                <p><strong>Diagnóstico:</strong> {user.profile.diagnosis || 'No especificado'}</p>
+              </div>
+            )}
+
+            <div className="preferences-info">
+              <h5>Preferencias</h5>
+              <p><strong>Tema:</strong> {user.profile.preferences.theme}</p>
+              <p><strong>Tamaño de fuente:</strong> {user.profile.preferences.fontSize}</p>
+              <p><strong>Reducir animaciones:</strong> {user.profile.preferences.reduceMotion ? 'Sí' : 'No'}</p>
+              <p><strong>Sonidos habilitados:</strong> {user.profile.preferences.soundEnabled ? 'Sí' : 'No'}</p>
+            </div>
+
+            <div className="progress-info">
+              <h5>Progreso</h5>
+              <p><strong>Juegos completados:</strong> {user.profile.progress.gamesCompleted}</p>
+              <p><strong>Tiempo total:</strong> {Math.round(user.profile.progress.totalTimeSpent / 60)} minutos</p>
+              <p><strong>Logros:</strong> {user.profile.progress.achievements.length}</p>
+            </div>
+
             <div className="profile-actions">
               <button 
-                className="logout-btn"
-                onClick={handleLogout}
+                onClick={() => setIsEditing(true)}
+                className="edit-btn"
               >
-                Cerrar Sesión
+                Editar Perfil
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
+
+      <div className="profile-footer">
+        <button 
+          onClick={handleLogout}
+          className="logout-btn"
+        >
+          Cerrar Sesión
+        </button>
       </div>
     </div>
   );

@@ -4,17 +4,14 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "es6",
-      "es2017",
-      "es2018",
-      "es2019",
-      "es2020"
+      "es6"
     ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -27,50 +24,19 @@
     "paths": {
       "@/*": ["*"],
       "@/components/*": ["components/*"],
-      "@/pages/*": ["pages/*"],
-      "@/utils/*": ["utils/*"],
-      "@/hooks/*": ["hooks/*"],
       "@/contexts/*": ["contexts/*"],
       "@/config/*": ["config/*"],
       "@/types/*": ["types/*"],
-      "@/assets/*": ["assets/*"]
-    },
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "declaration": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+      "@/utils/*": ["utils/*"]
+    }
   },
   "include": [
-    "src/**/*",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx"
+    "src",
+    "src/types/global.d.ts"
   ],
   "exclude": [
     "node_modules",
     "build",
-    "dist",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ],
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  }
+    "dist"
+  ]
 }

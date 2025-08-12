@@ -1,47 +1,45 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { 
-  User as FirebaseUser,
-  signInWithPopup,
-  GoogleAuthProvider,
+  User as FirebaseUser, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
-// Tipos para el usuario de MenteAzul
-interface MenteAzulUser {
+// Definir tipos de usuario
+export interface UserProfile {
+  childName?: string;
+  childAge?: number;
+  diagnosis?: 'tea' | 'asperger' | 'autismo' | 'otro';
+  preferences: {
+    theme: 'light' | 'dark' | 'high-contrast';
+    fontSize: 'small' | 'medium' | 'large';
+    reduceMotion: boolean;
+    soundEnabled: boolean;
+  };
+  progress: {
+    gamesCompleted: number;
+    totalTimeSpent: number;
+    lastActivity: Date;
+    achievements: string[];
+  };
+}
+
+export interface MenteAzulUser {
   uid: string;
   email: string;
   displayName: string;
   photoURL?: string;
-  role: 'student' | 'parent' | 'educator' | 'admin';
-  profile: {
-    childName?: string;
-    childAge?: number;
-    diagnosis?: 'tea' | 'asperger' | 'autismo' | 'otro';
-    preferences: {
-      theme: 'light' | 'dark' | 'high-contrast';
-      fontSize: 'small' | 'medium' | 'large';
-      reduceMotion: boolean;
-      soundEnabled: boolean;
-    };
-    progress: {
-      gamesCompleted: number;
-      totalPlayTime: number;
-      favoriteCategories: string[];
-      currentLevel: number;
-    };
-  };
-  subscription: {
-    plan: 'free' | 'premium';
-    status: 'active' | 'expired' | 'trial';
-    expiresAt?: Date;
-  };
+  role: 'parent' | 'therapist' | 'educator';
+  profile: UserProfile;
   createdAt: Date;
   lastLoginAt: Date;
 }
@@ -50,21 +48,30 @@ interface AuthContextType {
   user: MenteAzulUser | null;
   firebaseUser: FirebaseUser | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signUpWithEmail: (email: string, password: string, userData: Partial<MenteAzulUser>) => Promise<void>;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
+  error: string | null;
+  // Métodos de autenticación
+  loginWithGoogle: () => Promise<void>;
+  register: (email: string, password: string, userData: Partial<MenteAzulUser>) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateUserProfile: (updates: Partial<MenteAzulUser['profile']>) => Promise<void>;
-  isAuthenticated: boolean;
+  resetPassword: (email: string) => Promise<void>;
+  updateUserProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  clearError: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+// Declarar tipos para window
+declare global {
+  interface Window {
+    announceToScreenReader?: (message: string) => void;
+  }
+}
 
-// Hook para usar el contexto de autenticación
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
+  if (context === undefined) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
   return context;
 };
@@ -77,17 +84,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<MenteAzulUser | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Configuración de Google Provider
-  const googleProvider = new GoogleAuthProvider();
-  googleProvider.setCustomParameters({
-    prompt: 'select_account'
-  });
+  const clearError = () => setError(null);
 
-  // Crear perfil de usuario por defecto
   const createDefaultProfile = (firebaseUser: FirebaseUser, role: MenteAzulUser['role'] = 'parent'): Omit<MenteAzulUser, 'uid'> => ({
-    email: firebaseUser.email!,
-    displayName: firebaseUser.displayName || firebaseUser.email!.split('@')[0],
+    email: firebaseUser.email || '',
+    displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Usuario',
     photoURL: firebaseUser.photoURL || undefined,
     role,
     profile: {
@@ -99,63 +102,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       },
       progress: {
         gamesCompleted: 0,
-        totalPlayTime: 0,
-        favoriteCategories: [],
-        currentLevel: 1
+        totalTimeSpent: 0,
+        lastActivity: new Date(),
+        achievements: []
       }
-    },
-    subscription: {
-      plan: 'free',
-      status: 'active'
     },
     createdAt: new Date(),
     lastLoginAt: new Date()
   });
 
-  // Obtener o crear usuario en Firestore
-  const getOrCreateUser = async (firebaseUser: FirebaseUser): Promise<MenteAzulUser> => {
-    const userDocRef = doc(db, 'users', firebaseUser.uid);
-    const userDoc = await getDoc(userDocRef);
+  const saveUserToFirestore = async (userData: MenteAzulUser) => {
+    try {
+      const userRef = doc(db, 'users', userData.uid);
+      const dataToSave = {
+        ...userData,
+        createdAt: Timestamp.fromDate(userData.createdAt),
+        lastLoginAt: Timestamp.fromDate(userData.lastLoginAt),
+        'profile.progress.lastActivity': Timestamp.fromDate(userData.profile.progress.lastActivity)
+      };
+      await setDoc(userRef, dataToSave, { merge: true });
+    } catch (error) {
+      console.error('Error guardando usuario en Firestore:', error);
+      throw error;
+    }
+  };
 
-    if (userDoc.exists()) {
-      // Actualizar último login
-      const userData = userDoc.data() as MenteAzulUser;
-      await updateDoc(userDocRef, {
-        lastLoginAt: new Date()
-      });
-      
-      // Convertir timestamps de Firestore a Date
+  const loadUserFromFirestore = async (firebaseUser: FirebaseUser): Promise<MenteAzulUser> => {
+    const userRef = doc(db, 'users', firebaseUser.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
       return {
         ...userData,
         uid: firebaseUser.uid,
-        createdAt: userData.createdAt.toDate ? userData.createdAt.toDate() : userData.createdAt,
+        createdAt: userData.createdAt instanceof Timestamp ? userData.createdAt.toDate() : userData.createdAt,
         lastLoginAt: new Date()
       } as MenteAzulUser;
     } else {
-      // Crear nuevo usuario
       const newUserData = {
-        ...createDefaultProfile(firebaseUser),
-        uid: firebaseUser.uid
+        uid: firebaseUser.uid,
+        ...createDefaultProfile(firebaseUser)
       };
-
-      await setDoc(userDocRef, {
-        ...newUserData,
-        createdAt: new Date(),
-        lastLoginAt: new Date()
-      });
-
-      console.log('✅ Nuevo usuario creado en MenteAzul:', newUserData.email);
+      await saveUserToFirestore(newUserData);
       return newUserData;
     }
   };
 
-  // Iniciar sesión con Google
-  const signInWithGoogle = async () => {
+  const loginWithGoogle = async () => {
     try {
       setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const userData = await getOrCreateUser(result.user);
+      setError(null);
+      
+      const provider = new GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      
+      const result = await signInWithPopup(auth, provider);
+      const userData = await loadUserFromFirestore(result.user);
+      
       setUser(userData);
+      setFirebaseUser(result.user);
       
       // Anunciar a lectores de pantalla
       if (window.announceToScreenReader) {
@@ -163,41 +170,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Error en login con Google:', error);
-      throw new Error(error.message || 'Error al iniciar sesión con Google');
+      setError(error.message || 'Error al iniciar sesión con Google');
     } finally {
       setLoading(false);
     }
   };
 
-  // Registrarse con email y contraseña
-  const signUpWithEmail = async (email: string, password: string, userData: Partial<MenteAzulUser>) => {
+  const register = async (email: string, password: string, userData: Partial<MenteAzulUser>) => {
     try {
       setLoading(true);
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      setError(null);
       
-      // Actualizar perfil de Firebase con nombre
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+      
+      // Actualizar perfil de Firebase si se proporciona displayName
       if (userData.displayName) {
-        await updateProfile(result.user, {
-          displayName: userData.displayName
-        });
+        await updateProfile(firebaseUser, { displayName: userData.displayName });
       }
-
-      // Crear usuario en Firestore con datos personalizados
+      
       const newUserData: MenteAzulUser = {
-        ...createDefaultProfile(result.user),
+        uid: firebaseUser.uid,
+        ...createDefaultProfile(firebaseUser, userData.role),
         ...userData,
-        uid: result.user.uid,
-        email: result.user.email!
+        email: firebaseUser.email || email,
+        displayName: userData.displayName || firebaseUser.email?.split('@')[0] || 'Usuario'
       };
-
-      const userDocRef = doc(db, 'users', result.user.uid);
-      await setDoc(userDocRef, {
-        ...newUserData,
-        createdAt: new Date(),
-        lastLoginAt: new Date()
-      });
-
+      
+      await saveUserToFirestore(newUserData);
       setUser(newUserData);
+      setFirebaseUser(firebaseUser);
       
       console.log('✅ Usuario registrado exitosamente:', newUserData.email);
       
@@ -206,34 +208,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Error en registro:', error);
-      throw new Error(error.message || 'Error al crear la cuenta');
+      setError(error.message || 'Error al crear la cuenta');
     } finally {
       setLoading(false);
     }
   };
 
-  // Iniciar sesión con email y contraseña
-  const signInWithEmail = async (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const userData = await getOrCreateUser(result.user);
+      setError(null);
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userData = await loadUserFromFirestore(userCredential.user);
+      
       setUser(userData);
+      setFirebaseUser(userCredential.user);
       
       if (window.announceToScreenReader) {
         window.announceToScreenReader(`Bienvenido de vuelta, ${userData.displayName}`);
       }
     } catch (error: any) {
       console.error('Error en login:', error);
-      throw new Error(error.message || 'Error al iniciar sesión');
+      setError(error.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
   };
 
-  // Cerrar sesión
   const logout = async () => {
     try {
+      setLoading(true);
       await signOut(auth);
       setUser(null);
       setFirebaseUser(null);
@@ -243,28 +248,53 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Error en logout:', error);
-      throw new Error('Error al cerrar sesión');
+      setError(error.message || 'Error al cerrar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Actualizar perfil de usuario
-  const updateUserProfile = async (updates: Partial<MenteAzulUser['profile']>) => {
-    if (!user) throw new Error('Usuario no autenticado');
-    
+  const resetPassword = async (email: string) => {
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      const updatedProfile = { ...user.profile, ...updates };
-      
-      await updateDoc(userDocRef, {
-        profile: updatedProfile
-      });
-
-      setUser(prev => prev ? { ...prev, profile: updatedProfile } : null);
-      
-      console.log('✅ Perfil actualizado:', updates);
+      setLoading(true);
+      setError(null);
+      await sendPasswordResetEmail(auth, email);
     } catch (error: any) {
+      console.error('Error en reset password:', error);
+      setError(error.message || 'Error al enviar email de recuperación');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserProfile = async (updates: Partial<UserProfile>) => {
+    if (!user || !firebaseUser) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const updateData: any = {};
+      
+      // Construir update data de forma segura
+      Object.keys(updates).forEach(key => {
+        const value = updates[key as keyof UserProfile];
+        if (value !== undefined) {
+          updateData[`profile.${key}`] = value;
+        }
+      });
+      
+      await updateDoc(userRef, updateData);
+      
+      // Actualizar estado local
+      setUser(prevUser => prevUser ? {
+        ...prevUser,
+        profile: { ...prevUser.profile, ...updates }
+      } : null);
+      
+    } catch (error) {
       console.error('Error actualizando perfil:', error);
-      throw new Error('Error al actualizar el perfil');
+      throw error;
     }
   };
 
@@ -272,35 +302,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        setFirebaseUser(firebaseUser);
+        setLoading(true);
         
         if (firebaseUser) {
-          const userData = await getOrCreateUser(firebaseUser);
+          const userData = await loadUserFromFirestore(firebaseUser);
           setUser(userData);
+          setFirebaseUser(firebaseUser);
         } else {
           setUser(null);
+          setFirebaseUser(null);
         }
       } catch (error) {
-        console.error('Error en listener de auth:', error);
-        setUser(null);
+        console.error('Error en auth state change:', error);
+        setError('Error al cargar datos del usuario');
       } finally {
         setLoading(false);
       }
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   const value: AuthContextType = {
     user,
     firebaseUser,
     loading,
-    signInWithGoogle,
-    signUpWithEmail,
-    signInWithEmail,
+    error,
+    loginWithGoogle,
+    register,
+    login,
     logout,
+    resetPassword,
     updateUserProfile,
-    isAuthenticated: !!user
+    clearError
   };
 
   return (
