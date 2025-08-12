@@ -1,4 +1,4 @@
-﻿// src/App.tsx - Actualizado con sistema de autenticación
+// src/App.tsx - Actualizado con sistema de autenticación
 import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { MainApp } from './components/MainApp';
