@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="description" content="MenteAzul - Plataforma educativa especializada para niños con TEA. Juegos interactivos y herramientas de desarrollo cognitivo." />
+    
+    <!-- SEO y Accesibilidad -->
+    <meta name="keywords" content="autismo, TEA, educación, juegos educativos, desarrollo cognitivo, niños, accesibilidad" />
+    <meta name="author" content="MenteAzul Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="MenteAzul - Educación Especializada para TEA" />
+    <meta property="og:description" content="Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://menteazul.com" />
+    <meta property="og:image" content="%PUBLIC_URL%/logo512.png" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Preconnect para mejorar performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fuente accesible para dislexia -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>MenteAzul - Educación Especializada para TEA</title>
+    
+    <!-- Estilos base para accesibilidad -->
+    <style>
+      /* Reset básico y configuración accesible */
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f8fafc;
+        color: #1a202c;
+        line-height: 1.6;
+      }
+      
+      /* Configuración para usuarios con preferencias de movimiento reducido */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+      
+      /* Alto contraste para mejor accesibilidad */
+      @media (prefers-contrast: high) {
+        body {
+          background-color: #ffffff;
+          color: #000000;
+        }
+      }
+      
+      /* Loading inicial */
+      #root {
+        min-height: 100vh;
+      }
+      
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-size: 1.2rem;
+        color: #667eea;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
+        <h1>JavaScript Requerido</h1>
+        <p>MenteAzul requiere JavaScript para funcionar correctamente.</p>
+        <p>Por favor, habilita JavaScript en tu navegador para usar la plataforma.</p>
+      </div>
+    </noscript>
+    
+    <!-- Contenedor principal de React -->
+    <div id="root">
+      <div class="loading">
+        Cargando MenteAzul...
+      </div>
+    </div>
+    
+    <!-- Service Worker para PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('%PUBLIC_URL%/sw.js')
+            .then(function(registration) {
+              console.log('SW registered: ', registration);
+            })
+            .catch(function(registrationError) {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

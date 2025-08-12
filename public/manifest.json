@@ -1,0 +1,103 @@
+{
+  "short_name": "MenteAzul",
+  "name": "MenteAzul - Educación Especializada para TEA",
+  "description": "Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#f8fafc",
+  "categories": [
+    "education",
+    "games",
+    "health",
+    "accessibility",
+    "kids"
+  ],
+  "lang": "es",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Página principal de MenteAzul"
+    },
+    {
+      "src": "screenshot-narrow.png", 
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil de juegos educativos"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Juegos Educativos",
+      "short_name": "Juegos",
+      "description": "Acceder directamente a los juegos educativos",
+      "url": "/juegos",
+      "icons": [
+        {
+          "src": "icon-games.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Recursos para Padres",
+      "short_name": "Recursos",
+      "description": "Guías y recursos para padres y educadores",
+      "url": "/recursos",
+      "icons": [
+        {
+          "src": "icon-resources.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Configuración",
+      "short_name": "Config",
+      "description": "Ajustar preferencias de accesibilidad",
+      "url": "/configuracion",
+      "icons": [
+        {
+          "src": "icon-settings.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "protocol_handlers": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate"
+} 

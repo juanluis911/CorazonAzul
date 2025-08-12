@@ -1,0 +1,255 @@
+﻿# .gitignore para MenteAzul - Proyecto CorazónAzul
+
+# ========================================
+# VARIABLES DE ENTORNO Y CONFIGURACIÓN
+# ========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de configuración con credenciales
+firebase-adminsdk-*.json
+serviceAccountKey.json
+.firebaserc
+firebase.json
+
+# ========================================
+# DEPENDENCIAS
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# ========================================
+# BUILD Y DISTRIBUCIÓN
+# ========================================
+build/
+dist/
+.next/
+out/
+
+# ========================================
+# REACT ESPECÍFICO
+# ========================================
+# Create React App
+.eslintcache
+
+# Storybook
+storybook-static/
+
+# ========================================
+# TYPESCRIPT
+# ========================================
+*.tsbuildinfo
+.tscache/
+
+# ========================================
+# EDITORES E IDEs
+# ========================================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ========================================
+# SISTEMA OPERATIVO
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# LOGS Y CACHE
+# ========================================
+logs/
+*.log
+.npm
+.yarn-integrity
+.cache/
+.parcel-cache/
+
+# ========================================
+# TESTING
+# ========================================
+coverage/
+.nyc_output/
+.coverage/
+.pytest_cache/
+.jest/
+
+# ========================================
+# FIREBASE ESPECÍFICO
+# ========================================
+.firebase/
+.firebaserc.local
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+functions/lib/
+functions/node_modules/
+
+# ========================================
+# ARCHIVOS TEMPORALES Y BACKUP
+# ========================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*~
+
+# ========================================
+# ARCHIVOS DE DESARROLLO Y DEBUG
+# ========================================
+.env.debug
+debug.log
+error.log
+
+# ========================================
+# ASSETS Y MEDIA TEMPORALES
+# ========================================
+# Archivos grandes de desarrollo
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.mp3
+*.wav
+*.flac
+
+# Excepciones para assets del proyecto
+!src/assets/**/*.mp3
+!src/assets/**/*.wav
+!public/**/*.mp3
+!public/**/*.wav
+
+# ========================================
+# DOCUMENTACIÓN TEMPORAL
+# ========================================
+# Archivos de documentación temporal
+docs/temp/
+TODO.md
+NOTES.md
+.notes/
+
+# ========================================
+# ANÁLISIS Y REPORTES
+# ========================================
+.lighthouse/
+bundle-analyzer-report.html
+size-plugin.json
+
+# ========================================
+# LIBRERÍAS Y FRAMEWORKS ADICIONALES
+# ========================================
+# Tailwind CSS
+.tailwindcss-cache/
+
+# Styled Components
+.styled-components/
+
+# ========================================
+# DEPLOYMENT Y CI/CD
+# ========================================
+.vercel
+.netlify/
+.now
+
+# ========================================
+# SEGURIDAD Y PRIVACIDAD
+# ========================================
+# Nunca subir claves o tokens
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+private/
+
+# Archivos de usuario con información sensible
+user-data/
+uploads/
+data/users/
+
+# ========================================
+# ESPECÍFICO PARA MENTEAZUL
+# ========================================
+# Datos de testing con información de niños
+test-data/children/
+mock-users.json
+
+# Reportes de progreso con datos reales
+reports/user-progress/
+analytics/personal-data/
+
+# Backups de base de datos con información personal
+backups/firestore/
+exports/user-data/
+
+# ========================================
+# MONITOREO Y ANALYTICS
+# ========================================
+.sentry/
+.datadog/
+
+# ========================================
+# CONFIGURACIÓN LOCAL DE DESARROLLO
+# ========================================
+.local/
+local-config.json
+dev-settings.json

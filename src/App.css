@@ -1,0 +1,318 @@
+﻿/* ========================================
+   ESTILOS DEL COMPONENTE APP - MENTEAZUL
+   Estilos específicos para la página principal
+======================================== */
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Efecto de fondo animado sutil */
+.App::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Header principal */
+.App-header {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+/* Contenedor del logo */
+.logo-container {
+  margin-bottom: var(--spacing-2xl);
+  animation: fadeIn 1s ease-out;
+}
+
+/* Título principal */
+.main-title {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+}
+
+.main-title .mente {
+  color: #ffffff;
+}
+
+.main-title .azul {
+  color: #81c784;
+  text-shadow: 0 0 20px rgba(129, 199, 132, 0.5);
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  opacity: 0.9;
+  font-weight: 300;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Sección de bienvenida */
+.welcome-section {
+  max-width: 600px;
+  margin-bottom: var(--spacing-2xl);
+  animation: fadeIn 1.2s ease-out;
+}
+
+.welcome-section h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.description {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 0;
+}
+
+/* Navegación principal */
+.main-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+  animation: fadeIn 1.4s ease-out;
+}
+
+/* Botones de navegación */
+.nav-button {
+  min-width: 250px;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  border-radius: var(--radius-xl);
+  transition: all 0.3s ease;
+  text-transform: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+}
+
+.nav-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.nav-button:active {
+  transform: translateY(-1px);
+}
+
+/* Botón primario */
+.nav-button.primary {
+  background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+  color: white;
+}
+
+.nav-button.primary:hover {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botón secundario */
+.nav-button.secondary {
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+  color: white;
+}
+
+.nav-button.secondary:hover {
+  background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botón terciario */
+.nav-button.tertiary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.nav-button.tertiary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Información del proyecto */
+.project-info {
+  margin-bottom: var(--spacing-xl);
+  animation: fadeIn 1.6s ease-out;
+}
+
+.project-info p {
+  margin-bottom: var(--spacing-xs);
+  opacity: 0.8;
+}
+
+.version {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.status {
+  font-size: var(--font-size-sm);
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  display: inline-block;
+  backdrop-filter: blur(5px);
+}
+
+/* Preview de características */
+.features-preview {
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 1.8s ease-out;
+}
+
+.features-preview h3 {
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.features-list li {
+  padding: var(--spacing-xs) 0;
+  font-size: var(--font-size-base);
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Footer */
+.App-footer {
+  background: rgba(0, 0, 0, 0.2);
+  padding: var(--spacing-lg);
+  color: rgba(255, 255, 255, 0.8);
+  position: relative;
+  z-index: 1;
+}
+
+.App-footer p {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}
+
+.tech-info {
+  opacity: 0.7;
+  font-size: var(--font-size-sm);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .main-navigation {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .nav-button {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  .App-header {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+  
+  .nav-button {
+    min-width: 200px;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+  
+  .features-preview {
+    margin: 0 var(--spacing-sm) var(--spacing-xl);
+    padding: var(--spacing-lg);
+  }
+  
+  .description {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* Configuración para preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .App::before {
+    display: none;
+  }
+  
+  .logo-container,
+  .welcome-section,
+  .main-navigation,
+  .project-info,
+  .features-preview {
+    animation: none;
+  }
+  
+  .nav-button:hover {
+    transform: none;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .App {
+    background: linear-gradient(135deg, #000080 0%, #000040 100%);
+  }
+  
+  .nav-button {
+    border: 3px solid white;
+  }
+  
+  .features-preview {
+    border: 2px solid white;
+    background: rgba(255, 255, 255, 0.2);
+  }
+}

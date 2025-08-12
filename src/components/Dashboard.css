@@ -1,0 +1,231 @@
+/* src/components/Dashboard.css - Estilos básicos funcionales */
+
+.dashboard {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-mind));
+  color: white;
+  padding: var(--spacing-lg);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.welcome-message h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.child-info {
+  margin: var(--spacing-xs) 0 0 0;
+  opacity: 0.9;
+  font-size: var(--font-size-sm);
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.user-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.dashboard-main {
+  padding: var(--spacing-xl);
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.welcome-card {
+  background: white;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.subscription-status {
+  margin-top: var(--spacing-md);
+}
+
+.status-badge {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.main-navigation h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text-primary);
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.nav-card {
+  background: white;
+  border: none;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.nav-card h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-text-primary);
+}
+
+.nav-card p {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.card-stats {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.recent-activity,
+.project-info {
+  margin-bottom: var(--spacing-xl);
+}
+
+.activity-card,
+.info-card {
+  background: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.activity-time {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+.project-status {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0 0 0;
+}
+
+.project-status li {
+  padding: var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+}
+
+.dashboard-footer {
+  background: var(--color-bg-secondary);
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.footer-container p {
+  margin: var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive básico */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .user-section {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-main {
+    padding: var(--spacing-lg);
+  }
+}
