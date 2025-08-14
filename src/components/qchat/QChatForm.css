@@ -1,0 +1,114 @@
+/* QChatForm.css */
+
+.qchat-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.qchat-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.qchat-select-group {
+  margin-bottom: 1.5rem;
+}
+
+.qchat-select-group select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.qchat-progress-bar {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  height: 12px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.qchat-progress-fill {
+  background-color: #4a90e2;
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+.qchat-progress-text {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.qchat-question-card {
+  background-color: #f9fbfd;
+  border: 1px solid #dce4ec;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.qchat-question-text {
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+.qchat-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+}
+
+.qchat-option input {
+  margin-right: 0.5rem;
+}
+
+.qchat-submit-btn {
+  background-color: #27ae60;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.qchat-submit-btn:hover {
+  background-color: #219150;
+}
+
+.qchat-result {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #ecf9f0;
+  border: 1px solid #b8e2c6;
+  text-align: center;
+}
+
+.qchat-result h2 {
+  color: #2c7a4b;
+  margin-bottom: 1rem;
+}
+
+.qchat-result p {
+  font-size: 1.1rem;
+  margin: 0.3rem 0;
+}
+
+.qchat-result span {
+  font-weight: bold;
+}

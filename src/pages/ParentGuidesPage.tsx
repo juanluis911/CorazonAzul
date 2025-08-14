@@ -1,6 +1,7 @@
 // src/pages/ParentGuidesPage.tsx
 import React, { useState } from 'react';
 import QChatAssessment from '../components/qchat/QChatAssessment';
+import QChatForm from '../components/qchat/QChatQuiz';
 
 // Definir tipos para los recursos
 interface ResourceWithUrl {
@@ -466,7 +467,7 @@ const ParentGuidesPage: React.FC = () => {
 
       <main>
         {activeSection === 'overview' && renderOverview()}
-        {activeSection === 'qchat' && <QChatAssessment />}
+        {activeSection === 'qchat' && <QChatForm />}
         {activeSection === 'development' && renderDevelopment()}
         {activeSection === 'communication' && renderCommunication()}
         {activeSection === 'behavior' && renderBehavior()}
